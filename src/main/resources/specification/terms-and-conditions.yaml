@@ -1,0 +1,199 @@
+openapi: 3.0.2
+info:
+  title: FDK Terms And Conditions
+  description: Terms and conditions related to organizations in FDK
+  version: '1.0'
+  termsOfService: 'https://fellesdatakatalog.digdir.no/about'
+  contact:
+    name: Digitaliseringsdirektoratet
+    url: 'https://fellesdatakatalog.digdir.no'
+    email: fellesdatakatalog@digdir.no
+  license:
+    name: License of API
+    url: 'http://data.norge.no/nlod/no/2.0'
+externalDocs:
+  description: Dokumentasjon på Informasjonsforvaltning GitHub
+  url: https://informasjonsforvaltning.github.io
+tags:
+  - name: terms
+    description: FDK terms and conditions
+  - name: organization-terms
+    description: Organization terms and conditions
+paths:
+  /terms:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - terms
+      summary: Create new version of FDK terms and conditions
+      description: Create new version of FDK terms and conditions
+      operationId: createTermsAndConditions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TermsAndConditions'
+      responses:
+        '201':
+          description: Created version of FDK terms and conditions
+        '409':
+          description: This version already exists
+    get:
+      tags:
+        - terms
+      summary: Get all versions of FDK terms and conditions
+      description: Returns all versions of FDK terms and conditions, latest in position 0
+      operationId: getAllTermsAndConditions
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TermsAndConditions"
+  /terms/{version}:
+    get:
+      tags:
+        - terms
+      summary: Get a specific version of FDK terms and conditions
+      description: Returns a specific version of FDK terms and conditions, use version value 'latest' to get latest version
+      operationId: getTermsAndConditions
+      parameters:
+        - name: version
+          in: path
+          description: terms and conditions version
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TermsAndConditions"
+  /terms/org:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - organization-terms
+      summary: Accept organization terms and conditions
+      description: Accept organization terms and conditions
+      operationId: createOrgAcceptation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrgAcceptation'
+      responses:
+        '201':
+          description: Created
+  /terms/org/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - organization-terms
+      summary: Get organization terms and conditions info.
+      description: Returns organization terms and conditions info
+      operationId: getOrgAcceptation
+      parameters:
+        - name: id
+          in: path
+          description: organization id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrgAcceptation"
+        '404':
+          description: Organization has not accepted the terms and conditions
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - organization-terms
+      summary: Update organization terms and conditions acceptation
+      description: Update organization terms and conditions acceptation
+      operationId: updateOrgAcceptation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrgAcceptation'
+      parameters:
+        - name: id
+          in: path
+          description: organization id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Acceptation has been updated
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - organization-terms
+      summary: Remove organization acceptation history
+      description: Delete accept history for the organization
+      operationId: deleteOrgAcceptation
+      parameters:
+        - name: id
+          in: path
+          description: organization id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+components:
+  schemas:
+    OrgAcceptation:
+      type: object
+      description: An organizations current acceptation of FDK terms and conditions
+      properties:
+        orgId:
+          type: string
+          description: Organization id
+        acceptedVersion:
+          type: string
+          description: Accepted version of terms conditions.
+        acceptorName:
+          type: string
+          description: Name of the user who accepted terms and conditions on behalf of the organization
+        acceptDate:
+          type: string
+          format: date
+          description: Acceptation date of the terms and conditions
+    TermsAndConditions:
+      type: object
+      description: Terms and condtitions version and text
+      properties:
+        version:
+          type: string
+          description: version of conditions. Semantic versioning with three parts.
+        text:
+          type: string
+          description: Teext body of FDK terms and conditions
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
