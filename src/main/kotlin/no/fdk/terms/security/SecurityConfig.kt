@@ -20,6 +20,8 @@ open class SecurityConfig : WebSecurityConfigurerAdapter() {
                 .authorizeRequests()
                     .antMatchers(HttpMethod.OPTIONS)
                         .permitAll()
+                    .antMatchers(HttpMethod.GET, "/terms/org/**/version")
+                        .permitAll()
                     .antMatchers(HttpMethod.GET, "/terms/org/**")
                         .authenticated()
                     .antMatchers(HttpMethod.GET)

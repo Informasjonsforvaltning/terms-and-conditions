@@ -2,6 +2,7 @@ package no.fdk.terms.security;
 
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Component
+import javax.servlet.http.HttpServletRequest
 
 private const val ROLE_ROOT_ADMIN = "system:root:admin"
 private fun roleOrgAdmin(orgnr: String) = "organization:$orgnr:admin"
@@ -38,5 +39,10 @@ class EndpointPermissions{
         val authorities: String? = jwt.claims["authorities"] as? String
 
         return authorities?.contains(ROLE_ROOT_ADMIN) ?: false
+    }
+
+    fun isSSO(httpServletRequest: HttpServletRequest): Boolean {
+        // TODO
+        return true
     }
 }

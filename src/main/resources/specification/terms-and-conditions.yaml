@@ -161,6 +161,29 @@ paths:
       responses:
         '204':
           description: No Content
+  /terms/org/{id}/version:
+    get:
+      tags:
+        - organization-terms
+      summary: Get current accepted version id
+      description: Returns id of accepted terms and conditions
+      operationId: getOrgTermsVersion
+      parameters:
+        - name: id
+          in: path
+          description: organization id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+        '404':
+          description: Organization has not accepted the terms and conditions
 components:
   schemas:
     OrgAcceptation:
