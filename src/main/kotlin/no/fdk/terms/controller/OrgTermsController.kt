@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import javax.servlet.http.HttpServletRequest
 
 private val logger = LoggerFactory.getLogger(OrgTermsController::class.java)
 
@@ -77,6 +78,14 @@ class OrgTermsController(
             logger.info("Delete terms acceptations for organization with id $id")
             orgTermsService.deleteOrgAcceptation(id)
             ResponseEntity(HttpStatus.NO_CONTENT)
+        } else ResponseEntity(HttpStatus.FORBIDDEN)
+
+    @GetMapping(value = ["/{id}/version"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getOrgAcceptation(httpServletRequest: HttpServletRequest, @PathVariable id: String): ResponseEntity<String> =
+        if (endpointPermissions.isSSO(httpServletRequest)) {
+            orgTermsService.getOrgAcceptation(id)
+                ?.let { ResponseEntity(it.acceptedVersion, HttpStatus.OK) }
+                ?: ResponseEntity(HttpStatus.NOT_FOUND)
         } else ResponseEntity(HttpStatus.FORBIDDEN)
 
 }
