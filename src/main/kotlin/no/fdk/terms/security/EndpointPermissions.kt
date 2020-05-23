@@ -10,7 +10,9 @@ private fun roleOrgWrite(orgnr: String) = "organization:$orgnr:write"
 private fun roleOrgRead(orgnr: String) = "organization:$orgnr:read"
 
 @Component
-class EndpointPermissions{
+class EndpointPermissions(
+    private val securityProperties: SecurityProperties
+) {
 
     fun hasOrgReadPermission(jwt: Jwt, orgnr: String): Boolean {
         val authorities: String? = jwt.claims["authorities"] as? String
@@ -41,8 +43,10 @@ class EndpointPermissions{
         return authorities?.contains(ROLE_ROOT_ADMIN) ?: false
     }
 
-    fun isSSO(httpServletRequest: HttpServletRequest): Boolean {
-        // TODO
-        return true
-    }
+    fun isFromFDKCluster(httpServletRequest: HttpServletRequest): Boolean =
+        when (httpServletRequest.getHeader("X-API-KEY")) {
+            null -> false
+            securityProperties.userApiKey -> true
+            else -> false
+        }
 }
