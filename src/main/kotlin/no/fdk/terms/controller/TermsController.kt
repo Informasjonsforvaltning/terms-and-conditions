@@ -55,4 +55,10 @@ class TermsController(
             ?: ResponseEntity(HttpStatus.NOT_FOUND)
     }
 
+    @GetMapping(value = ["/latest/version"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getLatestVersion(): ResponseEntity<String> =
+        termsService.getTermsAndConditions("latest")
+            ?.let { ResponseEntity(it.version, HttpStatus.OK) }
+            ?: ResponseEntity(HttpStatus.NOT_FOUND)
+
 }
