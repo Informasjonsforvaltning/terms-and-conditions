@@ -83,7 +83,7 @@ class OrgTermsController(
         } else ResponseEntity(HttpStatus.FORBIDDEN)
 
     @GetMapping(value = ["/{id}/version"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getOrgAcceptation(httpServletRequest: HttpServletRequest, @PathVariable id: String): ResponseEntity<String> =
+    fun getOrgAcceptedVersion(httpServletRequest: HttpServletRequest, @PathVariable id: String): ResponseEntity<String> =
         if (endpointPermissions.isFromFDKCluster(httpServletRequest)) {
             orgTermsService.getOrgAcceptation(id)
                 ?.let { ResponseEntity(it.acceptedVersion, HttpStatus.OK) }
