@@ -18,3 +18,10 @@ spring:
   data.mongodb.uri: mongodb://admin:admin@localhost:27017/termsDB?authSource=admin&authMechanism=SCRAM-SHA-1
   security.oauth2.resourceserver.jwt.jwk-set-uri: http://localhost:8084/jwk
 application.secrets.userApiKey: userapisecret
+
+---
+spring:
+  profiles: contract-test
+  security.oauth2.resourceserver.jwt.jwk-set-uri: http://localhost:5000/auth/realms/fdk/protocol/openid-connect/certs
+application.secrets.userApiKey: userapisecret
+server.port: 5050
