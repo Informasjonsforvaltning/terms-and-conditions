@@ -32,10 +32,9 @@ class OrgTermsService (
 
     fun updateOrgAcceptation(acceptation: OrgAcceptation) {
         if (termsRepository.existsById(acceptation.acceptedVersion)) {
-            orgTermsRepository
-                .findByIdOrNull(acceptation.orgId)
-                ?.run { orgTermsRepository.save(acceptation) }
-                ?: throw OrgAcceptationNotFound()
+            if (orgTermsRepository.findByIdOrNull(acceptation.orgId) != null) {
+                orgTermsRepository.save(acceptation)
+            } else throw OrgAcceptationNotFound()
         } else throw TermsVersionNotFound()
     }
 
