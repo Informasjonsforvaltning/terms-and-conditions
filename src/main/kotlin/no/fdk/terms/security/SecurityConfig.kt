@@ -7,8 +7,8 @@ import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
-import org.springframework.security.oauth2.jwt.JwtDecoder
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
+import org.springframework.security.oauth2.jwt.*
+import org.springframework.security.oauth2.jwt.JwtClaimNames.AUD
 
 @Configuration
 open class SecurityConfig : WebSecurityConfigurerAdapter() {
@@ -36,7 +36,13 @@ open class SecurityConfig : WebSecurityConfigurerAdapter() {
     @Bean
     open fun jwtDecoder(properties: OAuth2ResourceServerProperties): JwtDecoder? {
         val jwtDecoder = NimbusJwtDecoder.withJwkSetUri(properties.jwt.jwkSetUri).build()
-        jwtDecoder.setJwtValidator(DelegatingOAuth2TokenValidator(AudienceValidator()))
+        jwtDecoder.setJwtValidator(
+                DelegatingOAuth2TokenValidator(
+                    JwtTimestampValidator(),
+                    JwtIssuerValidator(properties.jwt.issuerUri),
+                    JwtClaimValidator(AUD) { aud: List<String> -> aud.contains("terms-and-conditions") }
+            )
+        )
         return jwtDecoder
     }
 }

@@ -3,7 +3,9 @@ spring:
     default-property-inclusion: non_null
     date-format: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
   data.mongodb.uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017/termsDB?authSource=admin&authMechanism=SCRAM-SHA-1
-  security.oauth2.resourceserver.jwt.jwk-set-uri: ${JWK_KEY_SET_URI:http://sso:8084/auth/realms/fdk/protocol/openid-connect/certs}
+  security.oauth2.resourceserver.jwt:
+    jwk-set-uri: ${SSO_HOST:https://sso.staging.fellesdatakatalog.digdir.no}/auth/realms/fdk/protocol/openid-connect/certs
+    issuer-uri: ${SSO_HOST:https://sso.staging.fellesdatakatalog.digdir.no}/auth/realms/fdk
 logging:
   level.root: WARN
   level.no: ${LOG_LEVEL:DEBUG}
@@ -14,14 +16,16 @@ server.port: 8080
 
 ---
 spring:
-  profiles: develop
+  config.activate.on-profile: develop
   data.mongodb.uri: mongodb://admin:admin@localhost:27017/termsDB?authSource=admin&authMechanism=SCRAM-SHA-1
   security.oauth2.resourceserver.jwt.jwk-set-uri: http://localhost:8084/jwk
 application.secrets.userApiKey: userapisecret
 
 ---
 spring:
-  profiles: contract-test
-  security.oauth2.resourceserver.jwt.jwk-set-uri: http://localhost:5000/auth/realms/fdk/protocol/openid-connect/certs
+  config.activate.on-profile: contract-test
+  security.oauth2.resourceserver.jwt:
+    jwk-set-uri: http://localhost:5000/auth/realms/fdk/protocol/openid-connect/certs
+    issuer-uri: http://localhost:5000/auth/realms/fdk
 application.secrets.userApiKey: userapisecret
 server.port: 5050

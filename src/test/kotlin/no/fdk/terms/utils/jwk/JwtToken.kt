@@ -11,14 +11,15 @@ class JwtToken (private val access: Access) {
 
     private fun buildToken() : String{
         val claimset = JWTClaimsSet.Builder()
-                .audience(aud)
-                .expirationTime(Date(exp))
-                .claim("user_name","1924782563")
-                .claim("name", "TEST USER")
-                .claim("given_name", "TEST")
-                .claim("family_name", "USER")
-                .claim("authorities", access.authorities)
-                .build()
+            .audience(aud)
+            .expirationTime(Date(exp))
+            .claim("user_name","1924782563")
+            .claim("name", "TEST USER")
+            .claim("given_name", "TEST")
+            .claim("family_name", "USER")
+            .claim("iss", "http://localhost:5000/auth/realms/fdk")
+            .claim("authorities", access.authorities)
+            .build()
 
         val signed = SignedJWT(JwkStore.jwtHeader(), claimset)
         signed.sign(JwkStore.signer())
