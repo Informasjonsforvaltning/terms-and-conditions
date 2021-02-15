@@ -32,7 +32,7 @@ jobs:
         run: mvn -DtestImageName="eu.gcr.io/digdir-fdk-infra/terms-and-conditions:latest" verify --no-transfer-progress
 
       - name: Publish docker image to Google Cloud
-        run: docker -- push eu.gcr.io/digdir-fdk-infra/terms-and-conditions
+        run: docker -- push eu.gcr.io/digdir-fdk-infra/terms-and-conditions -a
 
       - name: Apply Helm template
         run: |
