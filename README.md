@@ -3,7 +3,7 @@ Provides FDK terms and conditions text, with versioning data, and a service for 
 
 ## Requirements
 - maven
-- java 8
+- java 15
 - docker
 - docker-compose
 
@@ -15,8 +15,7 @@ Provides FDK terms and conditions text, with versioning data, and a service for 
 ## Run locally
 ```
 docker-compose up -d
-mvn clean compile
-mvn exec:java -Dspring.profiles.active=develop
+mvn spring-boot:run -Dspring.profiles.active=develop
 ```
 
 Then in another terminal e.g.
