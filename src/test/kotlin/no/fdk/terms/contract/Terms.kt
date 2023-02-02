@@ -38,7 +38,7 @@ class Terms : ApiTestContext() {
     @Test
     fun getAllContainsVersionsSavedToDB() {
         val response = apiGet("/terms", emptyMap())
-        Assumptions.assumeTrue(HttpStatus.OK.value() == response["status"])
+        assertEquals(HttpStatus.OK.value(), response["status"])
 
         val responseBody: List<TermsAndConditions> = mapper.readValue(response["body"] as String)
         Assumptions.assumeTrue(responseBody.isNotEmpty())

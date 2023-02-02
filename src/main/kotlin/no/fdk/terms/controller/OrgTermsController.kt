@@ -7,6 +7,7 @@ import no.fdk.terms.model.TermsVersionNotFound
 import no.fdk.terms.security.EndpointPermissions
 import no.fdk.terms.service.OrgTermsService
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -19,9 +20,9 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import javax.servlet.http.HttpServletRequest
 
 private val logger = LoggerFactory.getLogger(OrgTermsController::class.java)
 
@@ -83,8 +84,8 @@ class OrgTermsController(
         } else ResponseEntity(HttpStatus.FORBIDDEN)
 
     @GetMapping(value = ["/{id}/version"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getOrgAcceptedVersion(httpServletRequest: HttpServletRequest, @PathVariable id: String): ResponseEntity<String> =
-        if (endpointPermissions.isFromFDKCluster(httpServletRequest)) {
+    fun getOrgAcceptedVersion(@RequestHeader headers: HttpHeaders, @PathVariable id: String): ResponseEntity<String> =
+        if (endpointPermissions.isFromFDKCluster(headers)) {
             orgTermsService.getOrgAcceptation(id)
                 ?.let { ResponseEntity(it.acceptedVersion, HttpStatus.OK) }
                 ?: ResponseEntity(HttpStatus.NOT_FOUND)
