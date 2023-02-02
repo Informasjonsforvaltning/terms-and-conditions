@@ -1,13 +1,13 @@
 package no.fdk.terms
 
-import no.fdk.terms.security.SecurityProperties
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.SpringApplication
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 
 @SpringBootApplication
-@EnableConfigurationProperties(SecurityProperties::class, OAuth2ResourceServerProperties::class)
+@ConfigurationPropertiesScan
+@EnableWebSecurity
 open class Application
 
 fun main(args: Array<String>) {

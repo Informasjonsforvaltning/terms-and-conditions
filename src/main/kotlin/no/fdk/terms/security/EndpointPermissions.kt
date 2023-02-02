@@ -1,8 +1,8 @@
 package no.fdk.terms.security;
 
+import org.springframework.http.HttpHeaders
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Component
-import javax.servlet.http.HttpServletRequest
 
 private const val ROLE_ROOT_ADMIN = "system:root:admin"
 private fun roleOrgAdmin(orgnr: String) = "organization:$orgnr:admin"
@@ -43,10 +43,12 @@ class EndpointPermissions(
         return authorities?.contains(ROLE_ROOT_ADMIN) ?: false
     }
 
-    fun isFromFDKCluster(httpServletRequest: HttpServletRequest): Boolean =
-        when (httpServletRequest.getHeader("X-API-KEY")) {
-            null -> false
-            securityProperties.userApiKey -> true
+    fun isFromFDKCluster(headers: HttpHeaders): Boolean {
+        val apiKey = headers["X-API-KEY"]
+        return when {
+            apiKey == null -> false
+            apiKey.contains(securityProperties.userApiKey) -> true
             else -> false
         }
+    }
 }
