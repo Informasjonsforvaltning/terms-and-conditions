@@ -53,8 +53,8 @@ class OrgTerms : ApiTestContext() {
 
         @Test
         fun invalidCreate() {
-            val alreadyExists = apiAuthorizedRequest("/terms/org", mapper.writeValueAsString(ACCEPTATION_0), JwtToken(Access.ORG_WRITE).toString(), "POST")
-            val versionDoesNotExist = apiAuthorizedRequest("/terms/org", mapper.writeValueAsString(ACCEPTATION_3.copy(acceptedVersion = "1.1.1")), JwtToken(Access.ORG_WRITE).toString(), "POST")
+            val alreadyExists = apiAuthorizedRequest("/terms/org", mapper.writeValueAsString(ACCEPTATION_0), JwtToken(Access.ORG_ADMIN).toString(), "POST")
+            val versionDoesNotExist = apiAuthorizedRequest("/terms/org", mapper.writeValueAsString(ACCEPTATION_3.copy(acceptedVersion = "1.1.1")), JwtToken(Access.ORG_ADMIN).toString(), "POST")
 
             assertEquals(HttpStatus.BAD_REQUEST.value(), alreadyExists["status"])
             assertEquals(HttpStatus.BAD_REQUEST.value(), versionDoesNotExist["status"])
@@ -121,8 +121,8 @@ class OrgTerms : ApiTestContext() {
 
         @Test
         fun invalidCreate() {
-            val doesNotExist = apiAuthorizedRequest("/terms/org/${ACCEPTATION_0.orgId}", mapper.writeValueAsString(ACCEPTATION_0.copy(orgId = "333222111")), JwtToken(Access.ORG_WRITE).toString(), "PUT")
-            val versionDoesNotExist = apiAuthorizedRequest("/terms/org/${ACCEPTATION_1.orgId}", mapper.writeValueAsString(ACCEPTATION_1.copy(acceptedVersion = "1.1.1")), JwtToken(Access.ORG_WRITE).toString(), "PUT")
+            val doesNotExist = apiAuthorizedRequest("/terms/org/${ACCEPTATION_0.orgId}", mapper.writeValueAsString(ACCEPTATION_0.copy(orgId = "333222111")), JwtToken(Access.ORG_ADMIN).toString(), "PUT")
+            val versionDoesNotExist = apiAuthorizedRequest("/terms/org/${ACCEPTATION_1.orgId}", mapper.writeValueAsString(ACCEPTATION_1.copy(acceptedVersion = "1.1.1")), JwtToken(Access.ORG_ADMIN).toString(), "PUT")
 
             assertEquals(HttpStatus.BAD_REQUEST.value(), doesNotExist["status"])
             assertEquals(HttpStatus.BAD_REQUEST.value(), versionDoesNotExist["status"])

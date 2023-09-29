@@ -37,6 +37,16 @@ class EndpointPermissions(
         }
     }
 
+    fun hasOrgAdminPermission(jwt: Jwt, orgnr: String): Boolean {
+        val authorities: String? = jwt.claims["authorities"] as? String
+
+        return when {
+            authorities == null -> false
+            authorities.contains(roleOrgAdmin(orgnr)) -> true
+            else -> false
+        }
+    }
+
     fun hasAdminPermission(jwt: Jwt): Boolean {
         val authorities: String? = jwt.claims["authorities"] as? String
 
