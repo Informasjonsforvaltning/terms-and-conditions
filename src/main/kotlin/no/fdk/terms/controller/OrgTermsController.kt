@@ -36,7 +36,7 @@ class OrgTermsController(
 
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun createOrgAcceptation(@AuthenticationPrincipal jwt: Jwt, @RequestBody accept: OrgAcceptation): ResponseEntity<Unit> =
-        if (endpointPermissions.hasOrgWritePermission(jwt, accept.orgId)) {
+        if (endpointPermissions.hasOrgAdminPermission(jwt, accept.orgId)) {
             logger.info("Accept terms, version ${accept.acceptedVersion}, for organization with id ${accept.orgId}")
             try {
                 orgTermsService.createOrgAcceptation(accept)
@@ -60,7 +60,7 @@ class OrgTermsController(
     @PutMapping(value = ["/{id}"], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun updateOrgAcceptation(@AuthenticationPrincipal jwt: Jwt, @PathVariable id: String, @RequestBody accept: OrgAcceptation): ResponseEntity<Unit> =
         when {
-            !endpointPermissions.hasOrgWritePermission(jwt, id) -> ResponseEntity<Unit>(HttpStatus.FORBIDDEN)
+            !endpointPermissions.hasOrgAdminPermission(jwt, id) -> ResponseEntity<Unit>(HttpStatus.FORBIDDEN)
             id != accept.orgId -> ResponseEntity<Unit>(HttpStatus.BAD_REQUEST)
             else -> {
                 logger.info("Accept terms, version ${accept.acceptedVersion}, for organization with id $id")
