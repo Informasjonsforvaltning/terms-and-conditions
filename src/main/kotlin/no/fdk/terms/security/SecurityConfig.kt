@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
 import org.springframework.security.oauth2.jwt.JwtClaimNames.AUD
 import org.springframework.security.oauth2.jwt.JwtClaimValidator
@@ -18,13 +19,16 @@ import org.springframework.security.web.SecurityFilterChain
 open class SecurityConfig {
     @Bean
     open fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        http.authorizeHttpRequests { authorize ->
-                authorize.requestMatchers(HttpMethod.OPTIONS).permitAll()
-                    .requestMatchers(HttpMethod.GET, "/terms/org/*/version").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/terms/org/*").authenticated()
-                    .requestMatchers(HttpMethod.GET).permitAll()
-                    .anyRequest().authenticated() }
-            .oauth2ResourceServer { resourceServer -> resourceServer.jwt() }
+        http {
+            authorizeHttpRequests {
+                authorize(HttpMethod.OPTIONS, "/**", permitAll)
+                authorize(HttpMethod.GET, "/terms/org/*/version", permitAll)
+                authorize(HttpMethod.GET, "/terms/org/*", authenticated)
+                authorize(HttpMethod.GET, "/**", permitAll)
+                authorize(anyRequest, authenticated)
+            }
+            oauth2ResourceServer { jwt { } }
+        }
         return http.build()
     }
 

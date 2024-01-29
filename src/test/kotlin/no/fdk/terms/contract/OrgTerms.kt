@@ -138,7 +138,7 @@ class OrgTerms : ApiTestContext() {
             val toUpdate = ACCEPTATION_1.copy(acceptedVersion = "1.2.4")
             Assumptions.assumeFalse(ACCEPTATION_1 == toUpdate)
 
-            val rspUpdate = apiAuthorizedRequest("/terms/org/${ACCEPTATION_1.orgId}", mapper.writeValueAsString(toUpdate), JwtToken(Access.ORG_WRITE).toString(), "PUT")
+            val rspUpdate = apiAuthorizedRequest("/terms/org/${ACCEPTATION_1.orgId}", mapper.writeValueAsString(toUpdate), JwtToken(Access.ORG_ADMIN).toString(), "PUT")
             Assumptions.assumeTrue(HttpStatus.NO_CONTENT.value() == rspUpdate["status"])
 
             val postUpdate = apiAuthorizedRequest("/terms/org/${ACCEPTATION_1.orgId}", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
