@@ -5,7 +5,7 @@ import no.fdk.terms.model.TermsAndConditions
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap
 import java.time.LocalDate
 
-const val LOCAL_SERVER_PORT = 5000
+const val LOCAL_SERVER_PORT = 6000
 const val API_TEST_PORT = 5050
 
 const val MONGO_USER = "testuser"
