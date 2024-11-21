@@ -7,14 +7,26 @@ on:
       - main
 
 jobs:
-  build-and-deploy-staging:
-    name: Call reusable workflow when pull request is created
+  build-terms-and-conditions:
+    name: Build when pull request is created
     if: ${{ github.actor != 'dependabot[bot]' && github.event.pull_request.draft == false }}
-    uses: Informasjonsforvaltning/workflows/.github/workflows/build-deploy-maven.yaml@main
+    uses: Informasjonsforvaltning/workflows/.github/workflows/build-push.yaml@main
     with:
       app_name: terms-and-conditions
       java_version: '17'
       coverage_file_path: ./target/site/jacoco/jacoco.xml
+      environment: staging
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  deploy:
+    name: Deploy to staging environment
+    if: ${{ github.actor != 'dependabot[bot]' && github.event.pull_request.draft == false }}
+    needs: [ build-terms-and-conditions ]
+    uses: Informasjonsforvaltning/workflows/.github/workflows/kustomize-deploy.yaml@main
+    with:
+      app_name: terms-and-conditions
       environment: staging
       cluster: digdir-fdk-dev
     secrets:
@@ -24,7 +36,7 @@ jobs:
 
   dependabot-build:
     name: Build image on PR from dependabot
-    if: ${{ github.actor == 'dependabot[bot]' }}
+    if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request' }}
     uses: Informasjonsforvaltning/workflows/.github/workflows/build.yaml@main
     with:
       java_version: '17'
