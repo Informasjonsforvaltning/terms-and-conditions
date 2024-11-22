@@ -1,6 +1,5 @@
 package no.fdk.terms.security;
 
-import org.springframework.http.HttpHeaders
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Component
 
@@ -9,8 +8,8 @@ private fun roleOrgAdmin(orgnr: String) = "organization:$orgnr:admin"
 private fun roleOrgWrite(orgnr: String) = "organization:$orgnr:write"
 private fun roleOrgRead(orgnr: String) = "organization:$orgnr:read"
 
-@Component
-class EndpointPermissions(
+@Component("authorizer")
+class Authorizer(
     private val securityProperties: SecurityProperties
 ) {
 
@@ -26,17 +25,6 @@ class EndpointPermissions(
         }
     }
 
-    fun hasOrgWritePermission(jwt: Jwt, orgnr: String): Boolean {
-        val authorities: String? = jwt.claims["authorities"] as? String
-
-        return when {
-            authorities == null -> false
-            authorities.contains(roleOrgAdmin(orgnr)) -> true
-            authorities.contains(roleOrgWrite(orgnr)) -> true
-            else -> false
-        }
-    }
-
     fun hasOrgAdminPermission(jwt: Jwt, orgnr: String): Boolean {
         val authorities: String? = jwt.claims["authorities"] as? String
 
@@ -47,14 +35,13 @@ class EndpointPermissions(
         }
     }
 
-    fun hasAdminPermission(jwt: Jwt): Boolean {
+    fun hasSysAdminPermission(jwt: Jwt): Boolean {
         val authorities: String? = jwt.claims["authorities"] as? String
 
         return authorities?.contains(ROLE_ROOT_ADMIN) ?: false
     }
 
-    fun isFromFDKCluster(headers: HttpHeaders): Boolean {
-        val apiKey = headers["X-API-KEY"]
+    fun isFromFDKCluster(apiKey: String?): Boolean {
         return when {
             apiKey == null -> false
             apiKey.contains(securityProperties.userApiKey) -> true
