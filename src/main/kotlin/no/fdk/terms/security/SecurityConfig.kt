@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2Res
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
@@ -19,12 +20,13 @@ import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 
 @Configuration
-open class SecurityConfig(
+@EnableMethodSecurity
+class SecurityConfig(
     @Value("\${application.cors.originPatterns}")
     val corsOriginPatterns: Array<String>
 ) {
     @Bean
-    open fun filterChain(http: HttpSecurity): SecurityFilterChain {
+    fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http {
             cors {
                 configurationSource = CorsConfigurationSource {
@@ -50,7 +52,7 @@ open class SecurityConfig(
     }
 
     @Bean
-    open fun jwtDecoder(properties: OAuth2ResourceServerProperties): JwtDecoder {
+    fun jwtDecoder(properties: OAuth2ResourceServerProperties): JwtDecoder {
         val jwtDecoder = NimbusJwtDecoder.withJwkSetUri(properties.jwt.jwkSetUri).build()
         jwtDecoder.setJwtValidator(
                 DelegatingOAuth2TokenValidator(

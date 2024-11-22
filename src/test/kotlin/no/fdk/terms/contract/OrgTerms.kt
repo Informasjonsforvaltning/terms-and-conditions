@@ -184,15 +184,15 @@ class OrgTerms : ApiTestContext() {
         @Test
         fun foundVersionEqualsVersionSavedToDB() {
             val response = apiGet("/terms/org/${ACCEPTATION_0.orgId}/version", mapOf(Pair("X-API-KEY", USER_API_KEY)))
-            Assumptions.assumeTrue(HttpStatus.OK.value() == response["status"])
+            assertEquals(HttpStatus.OK.value(), response["status"])
 
             assertEquals(ACCEPTATION_0.acceptedVersion, response["body"])
         }
 
         @Test
-        fun respondWithForbiddenWhenApiKeyIsWrong() {
+        fun respondWithUnauthorizedWhenApiKeyIsWrong() {
             val response = apiGet("/terms/org/${ACCEPTATION_0.orgId}/version", mapOf(Pair("X-API-KEY", "wrong-key")))
-            assertEquals(HttpStatus.FORBIDDEN.value(), response["status"])
+            assertEquals(HttpStatus.UNAUTHORIZED.value(), response["status"])
         }
 
     }
