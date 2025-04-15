@@ -91,16 +91,16 @@ private fun isOK(response: Int?): Boolean =
     else HttpStatus.resolve(response)?.is2xxSuccessful == true
 
 fun populateDB(){
-    val connectionString = ConnectionString("mongodb://${MONGO_USER}:${MONGO_PASSWORD}@localhost:${mongoContainer.getMappedPort(MONGO_PORT)}/termsDB?authSource=admin&authMechanism=SCRAM-SHA-1")
+    val connectionString = ConnectionString("mongodb://${MONGO_USER}:${MONGO_PASSWORD}@localhost:${mongoContainer.getMappedPort(MONGO_PORT)}/termsAndConditions?authSource=admin&authMechanism=SCRAM-SHA-1")
     val pojoCodecRegistry = CodecRegistries.fromRegistries(getDefaultCodecRegistry(), CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build()))
 
     val client: MongoClient = create(connectionString)
-    val mongoDatabase = client.getDatabase("termsDB").withCodecRegistry(pojoCodecRegistry)
+    val mongoDatabase = client.getDatabase("termsAndConditions").withCodecRegistry(pojoCodecRegistry)
 
-    val termsCollection = mongoDatabase.getCollection("terms")
+    val termsCollection = mongoDatabase.getCollection("catalogTerms")
     termsCollection.insertMany(termsDBPopulation())
 
-    val orgCollection = mongoDatabase.getCollection("org")
+    val orgCollection = mongoDatabase.getCollection("catalogAcceptances")
     orgCollection.insertMany(acceptationDBPopulation())
 
     client.close()
