@@ -1,34 +1,48 @@
 # Terms and conditions
-Provides FDK terms and conditions text, with versioning data, and a service for users to accept the terms and conditions on behalf of organizations.
 
-## Requirements
-- maven
-- java 15
-- docker
-- docker-compose
+This application provides an API for terms and conditions text (with versioning data) and a service for users to accept
+the terms and conditions on behalf of organizations. 
 
-## Run tests
-```
-% mvn verify
+For a broader understanding of the system’s context, refer to
+the [architecture documentation](https://github.com/Informasjonsforvaltning/architecture-documentation) wiki. For more
+specific context on this application, see the **Registration** and **IAM** subsystem section.
+
+## Getting Started
+
+These instructions will give you a copy of the project up and running on your local machine for development and testing
+purposes.
+
+### Prerequisites
+
+Ensure you have the following installed:
+
+- Java 21
+- Maven
+- Docker
+
+### Running locally
+
+Clone the repository
+
+```sh
+git clone https://github.com/Informasjonsforvaltning/terms-and-conditions.git
+cd terms-and-conditions
 ```
 
-## Run locally
-```
-docker-compose up -d
-mvn spring-boot:run -Dspring.profiles.active=develop
+Start MongoDB and the application (either through your IDE using the dev profile, or via CLI):
+
+```sh
+docker compose up -d
+mvn spring-boot:run -Dspring-boot.run.profiles=develop
 ```
 
-Then in another terminal e.g.
-```
-% curl http://localhost:8080/terms/org/123456789
-```
+### API Documentation (OpenAPI)
 
-## Datastore
-To inspect the MongoDB datastore, run in terminal
-```
-docker-compose exec mongodb mongo
-use admin
-db.auth("admin","admin")
-use termsDB
-db.orgterms.find()
+Once the application is running locally, the API documentation can be accessed
+at http://localhost:8080/swagger-ui/index.html
+
+### Running tests
+
+```sh
+mvn verify
 ```

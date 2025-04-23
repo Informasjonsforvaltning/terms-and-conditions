@@ -11,6 +11,6 @@ services:
       - 27017:27017
 
   sso:
-    image: docker.pkg.github.com/informasjonsforvaltning/auth-utils-java/auth-utils-java:latest
+    image: ghcr.io/informasjonsforvaltning/auth-utils-java/auth-utils-java:latest
     ports:
       - 8084:8084
