@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 private val logger = LoggerFactory.getLogger(OrgTermsController::class.java)
@@ -86,5 +87,16 @@ class OrgTermsController(
         orgTermsService.getOrgAcceptation(id)
             ?.let { ResponseEntity(it.acceptedVersion, HttpStatus.OK) }
             ?: ResponseEntity(HttpStatus.NOT_FOUND)
+
+    @PreAuthorize("@authorizer.isFromFDKCluster(#header)")
+    @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getAcceptationsByOrganizations(
+        @RequestHeader("X-API-KEY") header: String,
+        @RequestParam(required = true) organizations: List<String>,
+    ): ResponseEntity<List<OrgAcceptation>> =
+        ResponseEntity(
+            orgTermsService.getOrgAcceptations(organizations),
+            HttpStatus.OK
+        )
 
 }

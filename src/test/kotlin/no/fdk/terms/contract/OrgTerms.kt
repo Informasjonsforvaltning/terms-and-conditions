@@ -197,4 +197,39 @@ class OrgTerms : ApiTestContext() {
 
     }
 
+    @Nested
+    internal inner class SearchOrgAcceptedVersions {
+
+        @Test
+        fun respondWithUnauthorizedWhenApiKeyIsWrong() {
+            val response = apiGet("/terms/org?organizations=${ACCEPTATION_0.orgId}", mapOf(Pair("X-API-KEY", "wrong-key")))
+            assertEquals(HttpStatus.UNAUTHORIZED.value(), response["status"])
+        }
+
+        @Test
+        fun badRequestWhenMissingOrgList() {
+            val response = apiGet("/terms/org", mapOf(Pair("X-API-KEY", USER_API_KEY)))
+            assertEquals(HttpStatus.BAD_REQUEST.value(), response["status"])
+        }
+
+        @Test
+        fun okForOneOrganization() {
+            val response = apiGet("/terms/org?organizations=${ACCEPTATION_0.orgId}", mapOf(Pair("X-API-KEY", USER_API_KEY)))
+            assertEquals(HttpStatus.OK.value(), response["status"])
+
+            val result: List<OrgAcceptation> = mapper.readValue(response["body"] as String)
+            assertEquals(listOf(ACCEPTATION_0), result)
+        }
+
+        @Test
+        fun okForListOfOrganizations() {
+            val response = apiGet("/terms/org?organizations=${ACCEPTATION_0.orgId},${ACCEPTATION_4.orgId}", mapOf(Pair("X-API-KEY", USER_API_KEY)))
+            assertEquals(HttpStatus.OK.value(), response["status"])
+
+            val result: List<OrgAcceptation> = mapper.readValue(response["body"] as String)
+            assertEquals(listOf(ACCEPTATION_0, ACCEPTATION_4).sortedBy { it.orgId }, result.sortedBy { it.orgId })
+        }
+
+    }
+
 }
