@@ -42,6 +42,7 @@ class SecurityConfig(
             authorizeHttpRequests {
                 authorize(HttpMethod.OPTIONS, "/**", permitAll)
                 authorize(HttpMethod.GET, "/terms/org/*/version", permitAll)
+                authorize(HttpMethod.GET, "/terms/org", permitAll)
                 authorize(HttpMethod.GET, "/terms/org/*", authenticated)
                 authorize(HttpMethod.GET, "/**", permitAll)
                 authorize(anyRequest, authenticated)

@@ -21,6 +21,9 @@ class OrgTermsService (
     fun getOrgAcceptation(orgId: String): OrgAcceptation? =
         orgTermsRepository.findByIdOrNull(orgId)
 
+    fun getOrgAcceptations(organizations: List<String>): List<OrgAcceptation> =
+        orgTermsRepository.findAllById(organizations)
+
     fun createOrgAcceptation(acceptation: OrgAcceptation) {
         if (termsRepository.existsById(acceptation.acceptedVersion)) {
             orgTermsRepository

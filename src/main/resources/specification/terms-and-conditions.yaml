@@ -94,6 +94,31 @@ paths:
       responses:
         '201':
           description: Created
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - organization-terms
+      summary: Get terms and conditions accepted by list of organizations
+      operationId: getAcceptationsByOrganizations
+      parameters:
+        - name: organizations
+          in: query
+          description: Filter by organization numbers
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OrgAcceptation"
   /terms/org/{id}:
     get:
       security:
