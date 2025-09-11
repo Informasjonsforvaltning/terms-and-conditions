@@ -8,3 +8,6 @@ images:
   - name: terms-and-conditions
     newName: ghcr.io/informasjonsforvaltning/terms-and-conditions
     newTag: $(GIT_COMMIT_SHA)
+
+patches:
+  - path: env.yaml
