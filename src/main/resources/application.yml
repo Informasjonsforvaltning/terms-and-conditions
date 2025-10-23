@@ -12,8 +12,8 @@ spring:
     database: termsAndConditions
     auto-index-creation: true
   security.oauth2.resourceserver.jwt:
-    jwk-set-uri: ${SSO_HOST:https://sso.staging.fellesdatakatalog.digdir.no}/auth/realms/fdk/protocol/openid-connect/certs
-    issuer-uri: ${SSO_HOST:https://sso.staging.fellesdatakatalog.digdir.no}/auth/realms/fdk
+    jwk-set-uri: ${KEYCLOAK_OIDC_ISSUER:https://keycloak.staging.fellesdatakatalog.digdir.no/realms/fdk}/protocol/openid-connect/certs
+    issuer-uri: ${KEYCLOAK_OIDC_ISSUER:https://keycloak.staging.fellesdatakatalog.digdir.no/realms/fdk}
 logging:
   level.root: WARN
   level.no: ${LOG_LEVEL:DEBUG}
@@ -47,8 +47,8 @@ spring:
     authentication-database: admin
     replica-set-name: null
   security.oauth2.resourceserver.jwt:
-    jwk-set-uri: http://localhost:6000/auth/realms/fdk/protocol/openid-connect/certs
-    issuer-uri: http://localhost:6000/auth/realms/fdk
+    jwk-set-uri: http://localhost:6000/realms/fdk/protocol/openid-connect/certs
+    issuer-uri: http://localhost:6000/realms/fdk
 application:
   secrets.userApiKey: userapisecret
   cors.originPatterns: "*"
