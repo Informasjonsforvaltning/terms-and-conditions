@@ -3,6 +3,11 @@ spring:
     default-property-inclusion: non_null
     date-format: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
   data.mongodb:
+    auto-index-creation: true
+  security.oauth2.resourceserver.jwt:
+    jwk-set-uri: ${KEYCLOAK_OIDC_ISSUER:https://auth.staging.fellesdatakatalog.digdir.no/realms/fdk}/protocol/openid-connect/certs
+    issuer-uri: ${KEYCLOAK_OIDC_ISSUER:https://auth.staging.fellesdatakatalog.digdir.no/realms/fdk}
+  mongodb:
     host: ${MONGODB_HOST}
     username: ${MONGODB_USER}
     password: ${MONGODB_PASSWORD}
@@ -10,10 +15,6 @@ spring:
     replica-set-name: ${MONGODB_REPLICASET}
     port: 27017
     database: termsAndConditions
-    auto-index-creation: true
-  security.oauth2.resourceserver.jwt:
-    jwk-set-uri: ${KEYCLOAK_OIDC_ISSUER:https://auth.staging.fellesdatakatalog.digdir.no/realms/fdk}/protocol/openid-connect/certs
-    issuer-uri: ${KEYCLOAK_OIDC_ISSUER:https://auth.staging.fellesdatakatalog.digdir.no/realms/fdk}
 logging:
   level.root: WARN
   level.no: ${LOG_LEVEL:DEBUG}
@@ -27,7 +28,7 @@ server.port: 8080
 ---
 spring:
   config.activate.on-profile: develop
-  data.mongodb:
+  mongodb:
     host: localhost
     username: testuser
     password: testpassword
@@ -40,15 +41,15 @@ application:
 ---
 spring:
   config.activate.on-profile: contract-test
-  data.mongodb:
+  security.oauth2.resourceserver.jwt:
+    jwk-set-uri: http://localhost:6000/realms/fdk/protocol/openid-connect/certs
+    issuer-uri: http://localhost:6000/realms/fdk
+  mongodb:
     host: localhost
     username: testuser
     password: testpassword
     authentication-database: admin
     replica-set-name: null
-  security.oauth2.resourceserver.jwt:
-    jwk-set-uri: http://localhost:6000/realms/fdk/protocol/openid-connect/certs
-    issuer-uri: http://localhost:6000/realms/fdk
 application:
   secrets.userApiKey: userapisecret
   cors.originPatterns: "*"
