@@ -2,20 +2,13 @@ package no.fdk.terms.utils
 
 import no.fdk.terms.model.OrgAcceptation
 import no.fdk.terms.model.TermsAndConditions
-import org.testcontainers.shaded.com.google.common.collect.ImmutableMap
 import java.time.LocalDate
 
 const val LOCAL_SERVER_PORT = 6000
 const val API_TEST_PORT = 5050
 
-const val MONGO_USER = "testuser"
-const val MONGO_PASSWORD = "testpassword"
-const val MONGO_PORT = 27017
-
-val MONGO_ENV_VALUES: Map<String, String> = ImmutableMap.of(
-    "MONGO_INITDB_ROOT_USERNAME", MONGO_USER,
-    "MONGO_INITDB_ROOT_PASSWORD", MONGO_PASSWORD
-)
+const val DB_USER = "testuser"
+const val DB_PASSWORD = "testpassword"
 
 const val USER_API_KEY = "userapisecret"
 
@@ -78,23 +71,3 @@ val ACCEPTATION_4 = OrgAcceptation(
     acceptorName = "Unable To Update",
     acceptDate = LocalDate.now().minusWeeks(1)
 )
-
-fun termsDBPopulation(): List<org.bson.Document> =
-    listOf(TERMS_0, TERMS_1, TERMS_2, TERMS_3, TERMS_4)
-        .map { it.mapDBO() }
-
-fun acceptationDBPopulation(): List<org.bson.Document> =
-    listOf(ACCEPTATION_0, ACCEPTATION_1, ACCEPTATION_2, ACCEPTATION_4)
-        .map { it.mapDBO() }
-
-private fun TermsAndConditions.mapDBO(): org.bson.Document =
-    org.bson.Document()
-        .append("_id", version)
-        .append("text", text)
-
-private fun OrgAcceptation.mapDBO(): org.bson.Document =
-    org.bson.Document()
-        .append("_id", orgId)
-        .append("acceptedVersion", acceptedVersion)
-        .append("acceptorName", acceptorName)
-        .append("acceptDate", acceptDate)

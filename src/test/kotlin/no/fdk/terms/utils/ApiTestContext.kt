@@ -4,9 +4,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
-import org.testcontainers.containers.GenericContainer
-import org.testcontainers.containers.output.Slf4jLogConsumer
-import org.testcontainers.containers.wait.strategy.Wait
+import org.testcontainers.postgresql.PostgreSQLContainer
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
@@ -16,7 +14,9 @@ abstract class ApiTestContext {
     internal class Initializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
         override fun initialize(configurableApplicationContext: ConfigurableApplicationContext) {
             TestPropertyValues.of(
-                "spring.mongodb.port=${mongoContainer.getMappedPort(MONGO_PORT)}"
+                "spring.datasource.url=${postgresContainer.jdbcUrl}",
+                "spring.datasource.username=${postgresContainer.username}",
+                "spring.datasource.password=${postgresContainer.password}"
             ).applyTo(configurableApplicationContext.environment)
         }
     }
@@ -24,18 +24,18 @@ abstract class ApiTestContext {
     companion object {
 
         private val logger = LoggerFactory.getLogger(ApiTestContext::class.java)
-        val mongoContainer: KGenericContainer
+        val postgresContainer: PostgreSQLContainer
 
         init {
 
             startMockServer()
 
-            mongoContainer = KGenericContainer("mongo:latest")
-                .withEnv(MONGO_ENV_VALUES)
-                .withExposedPorts(MONGO_PORT)
-                .waitingFor(Wait.forListeningPort())
+            postgresContainer = PostgreSQLContainer("postgres:16")
+                .withDatabaseName("terms_and_conditions")
+                .withUsername(DB_USER)
+                .withPassword(DB_PASSWORD)
 
-            mongoContainer.start()
+            postgresContainer.start()
 
             populateDB()
 
@@ -58,6 +58,3 @@ abstract class ApiTestContext {
     }
 
 }
-
-// Hack needed because testcontainers use of generics confuses Kotlin
-class KGenericContainer(imageName: String) : GenericContainer<KGenericContainer>(imageName)

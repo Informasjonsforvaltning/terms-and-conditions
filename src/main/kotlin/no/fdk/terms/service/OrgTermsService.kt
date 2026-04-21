@@ -7,7 +7,6 @@ import no.fdk.terms.model.TermsVersionNotFound
 import no.fdk.terms.repository.OrgTermsRepository
 import no.fdk.terms.repository.TermsRepository
 import org.slf4j.LoggerFactory
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 private val logger = LoggerFactory.getLogger(OrgTermsService::class.java)
@@ -19,7 +18,7 @@ class OrgTermsService (
 ) {
 
     fun getOrgAcceptation(orgId: String): OrgAcceptation? =
-        orgTermsRepository.findByIdOrNull(orgId)
+        orgTermsRepository.findById(orgId).orElse(null)
 
     fun getOrgAcceptations(organizations: List<String>): List<OrgAcceptation> =
         orgTermsRepository.findAllById(organizations)
@@ -27,7 +26,7 @@ class OrgTermsService (
     fun createOrgAcceptation(acceptation: OrgAcceptation) {
         if (termsRepository.existsById(acceptation.acceptedVersion)) {
             orgTermsRepository
-                .findByIdOrNull(acceptation.orgId)
+                .findById(acceptation.orgId).orElse(null)
                 ?.run { throw OrgAcceptationAlreadyExists() }
                 ?: orgTermsRepository.save(acceptation)
         } else throw TermsVersionNotFound()
@@ -35,7 +34,7 @@ class OrgTermsService (
 
     fun updateOrgAcceptation(acceptation: OrgAcceptation) {
         if (termsRepository.existsById(acceptation.acceptedVersion)) {
-            if (orgTermsRepository.findByIdOrNull(acceptation.orgId) != null) {
+            if (orgTermsRepository.findById(acceptation.orgId).orElse(null) != null) {
                 orgTermsRepository.save(acceptation)
             } else throw OrgAcceptationNotFound()
         } else throw TermsVersionNotFound()

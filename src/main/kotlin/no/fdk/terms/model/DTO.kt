@@ -4,22 +4,38 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
-import org.springframework.data.annotation.Id
-import org.springframework.data.mongodb.core.mapping.Document
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 import java.time.LocalDate
 
-@Document(collection = "catalogAcceptances")
-data class OrgAcceptation (
-    @Id val orgId: String,
-    val acceptedVersion: String,
-    val acceptorName: String,
+@Entity
+@Table(name = "catalog_acceptances")
+data class OrgAcceptation(
+    @Id
+    @Column(name = "org_id")
+    val orgId: String = "",
+
+    @Column(name = "accepted_version", nullable = false)
+    val acceptedVersion: String = "",
+
+    @Column(name = "acceptor_name", nullable = false)
+    val acceptorName: String = "",
+
     @JsonDeserialize(using = LocalDateDeserializer::class)
     @JsonSerialize(using = LocalDateSerializer::class)
-    val acceptDate: LocalDate
+    @Column(name = "accept_date", nullable = false)
+    val acceptDate: LocalDate = LocalDate.now(),
 )
 
-@Document(collection = "catalogTerms")
-data class TermsAndConditions (
-    @Id val version: String,
-    val text: String
+@Entity
+@Table(name = "catalog_terms")
+data class TermsAndConditions(
+    @Id
+    @Column(name = "version")
+    val version: String = "",
+
+    @Column(name = "text", columnDefinition = "text", nullable = false)
+    val text: String = "",
 )

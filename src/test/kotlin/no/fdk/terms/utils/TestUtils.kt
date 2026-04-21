@@ -1,19 +1,13 @@
 package no.fdk.terms.utils
 
-import com.mongodb.ConnectionString
-import com.mongodb.MongoClientSettings.getDefaultCodecRegistry
-import com.mongodb.client.ClientSession
-import com.mongodb.client.MongoClient
-import com.mongodb.client.MongoClientFactory
-import com.mongodb.client.MongoClients.create
-import no.fdk.terms.utils.ApiTestContext.Companion.mongoContainer
-import org.bson.codecs.configuration.CodecRegistries
-import org.bson.codecs.pojo.PojoCodecProvider
+import no.fdk.terms.utils.ApiTestContext.Companion.postgresContainer
+import org.flywaydb.core.Flyway
 import org.springframework.http.HttpStatus
 import java.io.BufferedReader
 import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
+import java.sql.DriverManager
 
 fun apiGet(path: String, headers: Map<String,String>): Map<String,Any> {
 
@@ -90,18 +84,42 @@ private fun isOK(response: Int?): Boolean =
     if(response == null) false
     else HttpStatus.resolve(response)?.is2xxSuccessful == true
 
-fun populateDB(){
-    val connectionString = ConnectionString("mongodb://${MONGO_USER}:${MONGO_PASSWORD}@localhost:${mongoContainer.getMappedPort(MONGO_PORT)}/termsAndConditions?authSource=admin&authMechanism=SCRAM-SHA-1")
-    val pojoCodecRegistry = CodecRegistries.fromRegistries(getDefaultCodecRegistry(), CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build()))
+fun populateDB() {
+    Flyway.configure()
+        .dataSource(postgresContainer.jdbcUrl, DB_USER, DB_PASSWORD)
+        .load()
+        .migrate()
 
-    val client: MongoClient = create(connectionString)
-    val mongoDatabase = client.getDatabase("termsAndConditions").withCodecRegistry(pojoCodecRegistry)
+    val conn = DriverManager.getConnection(
+        postgresContainer.jdbcUrl,
+        DB_USER,
+        DB_PASSWORD
+    )
 
-    val termsCollection = mongoDatabase.getCollection("catalogTerms")
-    termsCollection.insertMany(termsDBPopulation())
+    conn.createStatement().execute("DELETE FROM catalog_acceptances")
+    conn.createStatement().execute("DELETE FROM catalog_terms")
 
-    val orgCollection = mongoDatabase.getCollection("catalogAcceptances")
-    orgCollection.insertMany(acceptationDBPopulation())
+    conn.prepareStatement("INSERT INTO catalog_terms (version, text) VALUES (?, ?)").use { ps ->
+        for (term in listOf(TERMS_0, TERMS_1, TERMS_2, TERMS_3, TERMS_4)) {
+            ps.setString(1, term.version)
+            ps.setString(2, term.text)
+            ps.addBatch()
+        }
+        ps.executeBatch()
+    }
 
-    client.close()
+    conn.prepareStatement(
+        "INSERT INTO catalog_acceptances (org_id, accepted_version, acceptor_name, accept_date) VALUES (?, ?, ?, ?)"
+    ).use { ps ->
+        for (acc in listOf(ACCEPTATION_0, ACCEPTATION_1, ACCEPTATION_2, ACCEPTATION_4)) {
+            ps.setString(1, acc.orgId)
+            ps.setString(2, acc.acceptedVersion)
+            ps.setString(3, acc.acceptorName)
+            ps.setObject(4, acc.acceptDate)
+            ps.addBatch()
+        }
+        ps.executeBatch()
+    }
+
+    conn.close()
 }

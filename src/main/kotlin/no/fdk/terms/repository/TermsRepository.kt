@@ -1,10 +1,10 @@
 package no.fdk.terms.repository
 
 import no.fdk.terms.model.TermsAndConditions
-import org.springframework.data.mongodb.repository.MongoRepository
+import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface TermsRepository : MongoRepository<TermsAndConditions, String> {
+interface TermsRepository : JpaRepository<TermsAndConditions, String> {
     fun findFirstByOrderByVersionDesc(): TermsAndConditions?
 }
