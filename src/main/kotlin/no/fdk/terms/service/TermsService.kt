@@ -4,7 +4,6 @@ import no.fdk.terms.model.NewVersionNotHighest
 import no.fdk.terms.model.TermsAndConditions
 import no.fdk.terms.model.VersionNotThreePartSemantic
 import no.fdk.terms.repository.TermsRepository
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.util.regex.Pattern
 
@@ -39,7 +38,7 @@ class TermsService(
     fun getTermsAndConditions(version: String): TermsAndConditions? =
         if (version == "latest") {
             termsRepository.findFirstByOrderByVersionDesc()
-        } else termsRepository.findByIdOrNull(version)
+        } else termsRepository.findById(version).orElse(null)
 
 }
 

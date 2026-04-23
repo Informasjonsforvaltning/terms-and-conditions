@@ -2,19 +2,20 @@ spring:
   jackson:
     default-property-inclusion: non_null
     date-format: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-  data.mongodb:
-    auto-index-creation: true
+  datasource:
+    url: jdbc:postgresql://${POSTGRESQL_HOST}:5432/${POSTGRESQL_DB:terms_and_conditions}
+    username: ${POSTGRESQL_USER}
+    password: ${POSTGRESQL_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
   security.oauth2.resourceserver.jwt:
     jwk-set-uri: ${KEYCLOAK_OIDC_ISSUER:https://auth.staging.fellesdatakatalog.digdir.no/realms/fdk}/protocol/openid-connect/certs
     issuer-uri: ${KEYCLOAK_OIDC_ISSUER:https://auth.staging.fellesdatakatalog.digdir.no/realms/fdk}
-  mongodb:
-    host: ${MONGODB_HOST}
-    username: ${MONGODB_USER}
-    password: ${MONGODB_PASSWORD}
-    authentication-database: ${MONGODB_AUTH}
-    replica-set-name: ${MONGODB_REPLICASET}
-    port: 27017
-    database: termsAndConditions
 logging:
   level.root: WARN
   level.no: ${LOG_LEVEL:DEBUG}
@@ -28,12 +29,10 @@ server.port: 8080
 ---
 spring:
   config.activate.on-profile: develop
-  mongodb:
-    host: localhost
+  datasource:
+    url: jdbc:postgresql://localhost:5432/terms_and_conditions
     username: testuser
     password: testpassword
-    authentication-database: admin
-    replica-set-name: null
 application:
   secrets.userApiKey: userapisecret
   cors.originPatterns: "*"
@@ -44,12 +43,10 @@ spring:
   security.oauth2.resourceserver.jwt:
     jwk-set-uri: http://localhost:6000/realms/fdk/protocol/openid-connect/certs
     issuer-uri: http://localhost:6000/realms/fdk
-  mongodb:
-    host: localhost
+  datasource:
+    url: jdbc:postgresql://localhost:5432/terms_and_conditions
     username: testuser
     password: testpassword
-    authentication-database: admin
-    replica-set-name: null
 application:
   secrets.userApiKey: userapisecret
   cors.originPatterns: "*"
