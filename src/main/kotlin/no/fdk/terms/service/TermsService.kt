@@ -9,9 +9,8 @@ import java.util.regex.Pattern
 
 @Service
 class TermsService(
-    private val termsRepository: TermsRepository
+    private val termsRepository: TermsRepository,
 ) {
-
     fun hasDBConnection(): Boolean =
         try {
             termsRepository.count()
@@ -28,22 +27,23 @@ class TermsService(
 
             if (terms.version.isHigherSemanticVersion(currentVersion)) {
                 termsRepository.save(terms)
-            } else throw NewVersionNotHighest()
+            } else {
+                throw NewVersionNotHighest()
+            }
         }
     }
 
-    fun getAllTermsAndConditions(): List<TermsAndConditions> =
-        termsRepository.findAll()
+    fun getAllTermsAndConditions(): List<TermsAndConditions> = termsRepository.findAll()
 
     fun getTermsAndConditions(version: String): TermsAndConditions? =
         if (version == "latest") {
             termsRepository.findFirstByOrderByVersionDesc()
-        } else termsRepository.findById(version).orElse(null)
-
+        } else {
+            termsRepository.findById(version).orElse(null)
+        }
 }
 
-private fun String.isThreePartSemanticVersion(): Boolean =
-    Pattern.matches("\\d+\\.\\d+\\.\\d+", this)
+private fun String.isThreePartSemanticVersion(): Boolean = Pattern.matches("\\d+\\.\\d+\\.\\d+", this)
 
 private fun String.isHigherSemanticVersion(oldVersion: String?): Boolean {
     val new: List<Int> = split(".").map { it.toInt() }

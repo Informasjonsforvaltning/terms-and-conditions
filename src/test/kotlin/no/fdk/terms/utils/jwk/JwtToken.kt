@@ -2,24 +2,27 @@ package no.fdk.terms.utils.jwk
 
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
-import java.util.*
+import java.util.Date
 
-
-class JwtToken (private val access: Access) {
+class JwtToken(
+    private val access: Access,
+) {
     private val exp = Date().time + 120 * 1000
     private val aud = listOf("terms-and-conditions")
 
-    private fun buildToken() : String{
-        val claimset = JWTClaimsSet.Builder()
-            .audience(aud)
-            .expirationTime(Date(exp))
-            .claim("user_name","1924782563")
-            .claim("name", "TEST USER")
-            .claim("given_name", "TEST")
-            .claim("family_name", "USER")
-            .claim("iss", "http://localhost:6000/realms/fdk")
-            .claim("authorities", access.authorities)
-            .build()
+    private fun buildToken(): String {
+        val claimset =
+            JWTClaimsSet
+                .Builder()
+                .audience(aud)
+                .expirationTime(Date(exp))
+                .claim("user_name", "1924782563")
+                .claim("name", "TEST USER")
+                .claim("given_name", "TEST")
+                .claim("family_name", "USER")
+                .claim("iss", "http://localhost:6000/realms/fdk")
+                .claim("authorities", access.authorities)
+                .build()
 
         val signed = SignedJWT(JwkStore.jwtHeader(), claimset)
         signed.sign(JwkStore.signer())
@@ -27,15 +30,14 @@ class JwtToken (private val access: Access) {
         return signed.serialize()
     }
 
-    override fun toString(): String {
-        return buildToken()
-    }
-
+    override fun toString(): String = buildToken()
 }
 
-enum class Access(val authorities: String) {
+enum class Access(
+    val authorities: String,
+) {
     ORG_READ("organization:123456789:read"),
     ORG_WRITE("organization:123456789:write,organization:112233445:write,organization:554433221:admin,organization:333222111:admin"),
     ORG_ADMIN("organization:123456789:admin,organization:112233445:admin,organization:554433221:admin,organization:333222111:admin"),
-    ROOT("system:root:admin")
+    ROOT("system:root:admin"),
 }

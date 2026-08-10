@@ -7,22 +7,21 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.testcontainers.postgresql.PostgreSQLContainer
 import java.io.IOException
 import java.net.HttpURLConnection
-import java.net.URL
+import java.net.URI
 
 abstract class ApiTestContext {
-
     internal class Initializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
         override fun initialize(configurableApplicationContext: ConfigurableApplicationContext) {
-            TestPropertyValues.of(
-                "spring.datasource.url=${postgresContainer.jdbcUrl}",
-                "spring.datasource.username=${postgresContainer.username}",
-                "spring.datasource.password=${postgresContainer.password}"
-            ).applyTo(configurableApplicationContext.environment)
+            TestPropertyValues
+                .of(
+                    "spring.datasource.url=${postgresContainer.jdbcUrl}",
+                    "spring.datasource.username=${postgresContainer.username}",
+                    "spring.datasource.password=${postgresContainer.password}",
+                ).applyTo(configurableApplicationContext.environment)
         }
     }
 
     companion object {
-
         private val logger = LoggerFactory.getLogger(ApiTestContext::class.java)
         val postgresContainer: PostgreSQLContainer
 
@@ -30,17 +29,18 @@ abstract class ApiTestContext {
 
             startMockServer()
 
-            postgresContainer = PostgreSQLContainer("postgres:16")
-                .withDatabaseName("terms_and_conditions")
-                .withUsername(DB_USER)
-                .withPassword(DB_PASSWORD)
+            postgresContainer =
+                PostgreSQLContainer("postgres:16")
+                    .withDatabaseName("terms_and_conditions")
+                    .withUsername(DB_USER)
+                    .withPassword(DB_PASSWORD)
 
             postgresContainer.start()
 
             populateDB()
 
             try {
-                val con = URL("http://localhost:6000/ping").openConnection() as HttpURLConnection
+                val con = URI("http://localhost:6000/ping").toURL().openConnection() as HttpURLConnection
                 con.connect()
                 if (con.responseCode != 200) {
                     logger.debug("Ping to mock server failed")
@@ -53,8 +53,6 @@ abstract class ApiTestContext {
                 e.printStackTrace()
                 stopMockServer()
             }
-
         }
     }
-
 }

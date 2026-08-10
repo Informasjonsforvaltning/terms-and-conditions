@@ -7,21 +7,17 @@ import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
-
 @CrossOrigin
 @RestController
-class StatusController (
-    private val termsService: TermsService
-){
-
+class StatusController(
+    private val termsService: TermsService,
+) {
     @GetMapping(value = ["/ping"])
-    fun ping(): ResponseEntity<Unit> =
-        ResponseEntity(HttpStatus.OK)
+    fun ping(): ResponseEntity<Unit> = ResponseEntity(HttpStatus.OK)
 
     @GetMapping(value = ["/ready"])
     fun ready(): ResponseEntity<Unit> {
         termsService.hasDBConnection()
         return ResponseEntity(HttpStatus.OK)
     }
-
 }

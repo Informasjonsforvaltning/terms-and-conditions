@@ -25,12 +25,14 @@ private val logger = LoggerFactory.getLogger(TermsController::class.java)
 @RestController
 @RequestMapping(value = ["/terms"])
 class TermsController(
-    private val termsService: TermsService
+    private val termsService: TermsService,
 ) {
-
     @PreAuthorize("@authorizer.hasSysAdminPermission(#jwt)")
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun createTermsAndConditions(@AuthenticationPrincipal jwt: Jwt, @RequestBody terms: TermsAndConditions): ResponseEntity<Unit> =
+    fun createTermsAndConditions(
+        @AuthenticationPrincipal jwt: Jwt,
+        @RequestBody terms: TermsAndConditions,
+    ): ResponseEntity<Unit> =
         try {
             logger.info("Create terms and conditions, version ${terms.version}")
             termsService.createTermsAndConditions(terms)
@@ -48,17 +50,20 @@ class TermsController(
     }
 
     @GetMapping(value = ["/{version}"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getTermsAndConditions(@PathVariable version: String): ResponseEntity<TermsAndConditions> {
+    fun getTermsAndConditions(
+        @PathVariable version: String,
+    ): ResponseEntity<TermsAndConditions> {
         logger.info("Get terms and conditions version $version")
-        return termsService.getTermsAndConditions(version)
+        return termsService
+            .getTermsAndConditions(version)
             ?.let { ResponseEntity(it, HttpStatus.OK) }
             ?: ResponseEntity(HttpStatus.NOT_FOUND)
     }
 
     @GetMapping(value = ["/latest/version"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getLatestVersion(): ResponseEntity<String> =
-        termsService.getTermsAndConditions("latest")
+        termsService
+            .getTermsAndConditions("latest")
             ?.let { ResponseEntity(it.version, HttpStatus.OK) }
             ?: ResponseEntity(HttpStatus.NOT_FOUND)
-
 }

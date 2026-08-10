@@ -24,17 +24,16 @@ import org.springframework.test.context.ContextConfiguration
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-
 private val mapper = jacksonObjectMapper()
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(
     properties = ["spring.profiles.active=contract-test"],
-    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
+)
 @ContextConfiguration(initializers = [ApiTestContext.Initializer::class])
 @Tag("contract")
 class Terms : ApiTestContext() {
-
     @Test
     fun getAllContainsVersionsSavedToDB() {
         val response = apiGet("/terms", emptyMap())
@@ -91,15 +90,16 @@ class Terms : ApiTestContext() {
 
     @Nested
     internal inner class InvalidCreate {
-
         @Test
         fun createDemandsRootAccess() {
             val toCreate = TermsAndConditions(version = "1.2.3", text = "Will not be created")
 
-            val writeCreate = apiAuthorizedRequest("/terms", mapper.writeValueAsString(toCreate), JwtToken(Access.ORG_WRITE).toString(), "POST")
+            val writeCreate =
+                apiAuthorizedRequest("/terms", mapper.writeValueAsString(toCreate), JwtToken(Access.ORG_WRITE).toString(), "POST")
             assertEquals(HttpStatus.FORBIDDEN.value(), writeCreate["status"])
 
-            val readCreate = apiAuthorizedRequest("/terms", mapper.writeValueAsString(toCreate), JwtToken(Access.ORG_WRITE).toString(), "POST")
+            val readCreate =
+                apiAuthorizedRequest("/terms", mapper.writeValueAsString(toCreate), JwtToken(Access.ORG_WRITE).toString(), "POST")
             assertEquals(HttpStatus.FORBIDDEN.value(), readCreate["status"])
 
             val noTokenCreate = apiAuthorizedRequest("/terms", mapper.writeValueAsString(toCreate), null, "POST")
@@ -113,18 +113,19 @@ class Terms : ApiTestContext() {
             assertEquals(HttpStatus.BAD_REQUEST.value(), rsp0["status"])
 
             val versionContainsLetters = TermsAndConditions(version = "1.b.3", text = "Will not be created")
-            val rsp1 = apiAuthorizedRequest("/terms", mapper.writeValueAsString(versionContainsLetters), JwtToken(Access.ROOT).toString(), "POST")
+            val rsp1 =
+                apiAuthorizedRequest("/terms", mapper.writeValueAsString(versionContainsLetters), JwtToken(Access.ROOT).toString(), "POST")
             assertEquals(HttpStatus.BAD_REQUEST.value(), rsp1["status"])
 
             val versionHasTwoParts = TermsAndConditions(version = "1.3", text = "Will not be created")
-            val rsp2 = apiAuthorizedRequest("/terms", mapper.writeValueAsString(versionHasTwoParts), JwtToken(Access.ROOT).toString(), "POST")
+            val rsp2 =
+                apiAuthorizedRequest("/terms", mapper.writeValueAsString(versionHasTwoParts), JwtToken(Access.ROOT).toString(), "POST")
             assertEquals(HttpStatus.BAD_REQUEST.value(), rsp2["status"])
 
             val versionHasHasParts = TermsAndConditions(version = "1.2.3.4", text = "Will not be created")
-            val rsp3 = apiAuthorizedRequest("/terms", mapper.writeValueAsString(versionHasHasParts), JwtToken(Access.ROOT).toString(), "POST")
+            val rsp3 =
+                apiAuthorizedRequest("/terms", mapper.writeValueAsString(versionHasHasParts), JwtToken(Access.ROOT).toString(), "POST")
             assertEquals(HttpStatus.BAD_REQUEST.value(), rsp3["status"])
         }
-
     }
-
 }

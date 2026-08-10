@@ -16,13 +16,10 @@ data class OrgAcceptation(
     @Id
     @Column(name = "org_id")
     val orgId: String = "",
-
     @Column(name = "accepted_version", nullable = false)
     val acceptedVersion: String = "",
-
     @Column(name = "acceptor_name", nullable = false)
     val acceptorName: String = "",
-
     @JsonDeserialize(using = LocalDateDeserializer::class)
     @JsonSerialize(using = LocalDateSerializer::class)
     @Column(name = "accept_date", nullable = false)
@@ -35,7 +32,6 @@ data class TermsAndConditions(
     @Id
     @Column(name = "version")
     val version: String = "",
-
     @Column(name = "text", columnDefinition = "text", nullable = false)
     val text: String = "",
 )

@@ -20,29 +20,27 @@ class Terms {
 
     @Nested
     internal inner class Create {
+        @Test
+        fun throwsExceptionWhenVersionIsInvalid() {
+            val versionEmpty = TermsAndConditions(version = "", text = "")
+            val versionHasOnePart = TermsAndConditions(version = "123", text = "")
+            val versionHasTwoParts = TermsAndConditions(version = "1.23", text = "")
+            val versionHasMoreThanThreeParts = TermsAndConditions(version = "1.2.3.4", text = "")
+            val versionPartOneContainsNonNumber = TermsAndConditions(version = "1s2.2.3", text = "")
+            val versionPartTwoContainsNonNumber = TermsAndConditions(version = "1.-4.3", text = "")
+            val versionPartThreeContainsNonNumber = TermsAndConditions(version = "1.2.(3)", text = "")
 
-            @Test
-            fun throwsExceptionWhenVersionIsInvalid() {
-                val versionEmpty = TermsAndConditions(version = "", text = "")
-                val versionHasOnePart = TermsAndConditions(version = "123", text = "")
-                val versionHasTwoParts = TermsAndConditions(version = "1.23", text = "")
-                val versionHasMoreThanThreeParts = TermsAndConditions(version = "1.2.3.4", text = "")
-                val versionPartOneContainsNonNumber = TermsAndConditions(version = "1s2.2.3", text = "")
-                val versionPartTwoContainsNonNumber = TermsAndConditions(version = "1.-4.3", text = "")
-                val versionPartThreeContainsNonNumber = TermsAndConditions(version = "1.2.(3)", text = "")
-
-                assertThrows<VersionNotThreePartSemantic> { termsService.createTermsAndConditions(versionEmpty) }
-                assertThrows<VersionNotThreePartSemantic> { termsService.createTermsAndConditions(versionHasOnePart) }
-                assertThrows<VersionNotThreePartSemantic> { termsService.createTermsAndConditions(versionHasTwoParts) }
-                assertThrows<VersionNotThreePartSemantic> { termsService.createTermsAndConditions(versionHasMoreThanThreeParts) }
-                assertThrows<VersionNotThreePartSemantic> { termsService.createTermsAndConditions(versionPartOneContainsNonNumber) }
-                assertThrows<VersionNotThreePartSemantic> { termsService.createTermsAndConditions(versionPartTwoContainsNonNumber) }
-                assertThrows<VersionNotThreePartSemantic> { termsService.createTermsAndConditions(versionPartThreeContainsNonNumber) }
-            }
+            assertThrows<VersionNotThreePartSemantic> { termsService.createTermsAndConditions(versionEmpty) }
+            assertThrows<VersionNotThreePartSemantic> { termsService.createTermsAndConditions(versionHasOnePart) }
+            assertThrows<VersionNotThreePartSemantic> { termsService.createTermsAndConditions(versionHasTwoParts) }
+            assertThrows<VersionNotThreePartSemantic> { termsService.createTermsAndConditions(versionHasMoreThanThreeParts) }
+            assertThrows<VersionNotThreePartSemantic> { termsService.createTermsAndConditions(versionPartOneContainsNonNumber) }
+            assertThrows<VersionNotThreePartSemantic> { termsService.createTermsAndConditions(versionPartTwoContainsNonNumber) }
+            assertThrows<VersionNotThreePartSemantic> { termsService.createTermsAndConditions(versionPartThreeContainsNonNumber) }
+        }
 
         @Nested
         internal inner class VersionNotHighest {
-
             @Test
             fun lowerMajor() {
                 val existing = TermsAndConditions("12.1.0", "Some text")
@@ -82,12 +80,10 @@ class Terms {
 
                 assertThrows<NewVersionNotHighest> { termsService.createTermsAndConditions(newTerms) }
             }
-
         }
 
         @Nested
         internal inner class HigherVersionsIsSaved {
-
             @Test
             fun higherMajor() {
                 val existing = TermsAndConditions("12.1.0", "Some text")
@@ -131,14 +127,11 @@ class Terms {
 
                 verify(termsRepository, times(1)).save(newTerms)
             }
-
         }
-
     }
 
     @Nested
     internal inner class GetOne {
-
         @Test
         fun findLatestUsesCorrectMethod() {
             termsService.getTermsAndConditions("latest")
@@ -154,7 +147,5 @@ class Terms {
             verify(termsRepository, times(0)).findFirstByOrderByVersionDesc()
             verify(termsRepository, times(1)).findById("1.0.0")
         }
-
     }
-
 }

@@ -15,7 +15,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDate
-import java.util.*
+import java.util.Optional
 
 @Tag("unit")
 class OrgTerms {
@@ -25,17 +25,17 @@ class OrgTerms {
 
     @Nested
     internal inner class Create {
-
         @Test
         fun throwsExceptionWhenVersionDoesNotExist() {
             whenever(termsRepository.existsById("1.2.3")).thenReturn(false)
 
-            val acceptation = OrgAcceptation(
-                orgId = "123456789",
-                acceptedVersion = "1.2.3",
-                acceptorName = "Firstname Lastname",
-                acceptDate = LocalDate.now()
-            )
+            val acceptation =
+                OrgAcceptation(
+                    orgId = "123456789",
+                    acceptedVersion = "1.2.3",
+                    acceptorName = "Firstname Lastname",
+                    acceptDate = LocalDate.now(),
+                )
 
             assertThrows<TermsVersionNotFound> { orgTermsService.createOrgAcceptation(acceptation) }
         }
@@ -44,22 +44,24 @@ class OrgTerms {
         fun throwsExceptionWhenOrgHasAlreadyAccepted() {
             whenever(termsRepository.existsById("1.2.3")).thenReturn(true)
 
-            val existingAcceptation = OrgAcceptation(
-                orgId = "123456789",
-                acceptedVersion = "1.0.0",
-                acceptorName = "Firstname Lastname",
-                acceptDate = LocalDate.now().minusWeeks(1)
-            )
+            val existingAcceptation =
+                OrgAcceptation(
+                    orgId = "123456789",
+                    acceptedVersion = "1.0.0",
+                    acceptorName = "Firstname Lastname",
+                    acceptDate = LocalDate.now().minusWeeks(1),
+                )
 
             whenever(orgTermsRepository.findById("123456789"))
                 .thenReturn(Optional.of(existingAcceptation))
 
-            val acceptation = OrgAcceptation(
-                orgId = "123456789",
-                acceptedVersion = "1.2.3",
-                acceptorName = "Firstname Lastname",
-                acceptDate = LocalDate.now()
-            )
+            val acceptation =
+                OrgAcceptation(
+                    orgId = "123456789",
+                    acceptedVersion = "1.2.3",
+                    acceptorName = "Firstname Lastname",
+                    acceptDate = LocalDate.now(),
+                )
 
             assertThrows<OrgAcceptationAlreadyExists> { orgTermsService.createOrgAcceptation(acceptation) }
         }
@@ -70,33 +72,33 @@ class OrgTerms {
             whenever(orgTermsRepository.findById("123456789"))
                 .thenReturn(Optional.empty())
 
-            val acceptation = OrgAcceptation(
-                orgId = "123456789",
-                acceptedVersion = "1.2.3",
-                acceptorName = "Firstname Lastname",
-                acceptDate = LocalDate.now()
-            )
+            val acceptation =
+                OrgAcceptation(
+                    orgId = "123456789",
+                    acceptedVersion = "1.2.3",
+                    acceptorName = "Firstname Lastname",
+                    acceptDate = LocalDate.now(),
+                )
 
             orgTermsService.createOrgAcceptation(acceptation)
 
             verify(orgTermsRepository, times(1)).save(acceptation)
         }
-
     }
 
     @Nested
     internal inner class Update {
-
         @Test
         fun throwsExceptionWhenVersionDoesNotExist() {
             whenever(termsRepository.existsById("1.2.3")).thenReturn(false)
 
-            val acceptation = OrgAcceptation(
-                orgId = "123456789",
-                acceptedVersion = "1.2.3",
-                acceptorName = "Firstname Lastname",
-                acceptDate = LocalDate.now()
-            )
+            val acceptation =
+                OrgAcceptation(
+                    orgId = "123456789",
+                    acceptedVersion = "1.2.3",
+                    acceptorName = "Firstname Lastname",
+                    acceptDate = LocalDate.now(),
+                )
 
             assertThrows<TermsVersionNotFound> { orgTermsService.updateOrgAcceptation(acceptation) }
         }
@@ -107,13 +109,13 @@ class OrgTerms {
             whenever(orgTermsRepository.findById("123456789"))
                 .thenReturn(Optional.empty())
 
-
-            val acceptation = OrgAcceptation(
-                orgId = "123456789",
-                acceptedVersion = "1.2.3",
-                acceptorName = "Firstname Lastname",
-                acceptDate = LocalDate.now()
-            )
+            val acceptation =
+                OrgAcceptation(
+                    orgId = "123456789",
+                    acceptedVersion = "1.2.3",
+                    acceptorName = "Firstname Lastname",
+                    acceptDate = LocalDate.now(),
+                )
 
             assertThrows<OrgAcceptationNotFound> { orgTermsService.updateOrgAcceptation(acceptation) }
         }
@@ -122,28 +124,28 @@ class OrgTerms {
         fun savedWhenTermsExistsAndOrgHasEarlierAcceptations() {
             whenever(termsRepository.existsById("1.2.3")).thenReturn(true)
 
-            val existingAcceptation = OrgAcceptation(
-                orgId = "123456789",
-                acceptedVersion = "1.0.0",
-                acceptorName = "Firstname Lastname",
-                acceptDate = LocalDate.now().minusWeeks(1)
-            )
+            val existingAcceptation =
+                OrgAcceptation(
+                    orgId = "123456789",
+                    acceptedVersion = "1.0.0",
+                    acceptorName = "Firstname Lastname",
+                    acceptDate = LocalDate.now().minusWeeks(1),
+                )
 
             whenever(orgTermsRepository.findById("123456789"))
                 .thenReturn(Optional.of(existingAcceptation))
 
-            val acceptation = OrgAcceptation(
-                orgId = "123456789",
-                acceptedVersion = "1.2.3",
-                acceptorName = "Firstname Lastname",
-                acceptDate = LocalDate.now()
-            )
+            val acceptation =
+                OrgAcceptation(
+                    orgId = "123456789",
+                    acceptedVersion = "1.2.3",
+                    acceptorName = "Firstname Lastname",
+                    acceptDate = LocalDate.now(),
+                )
 
             orgTermsService.updateOrgAcceptation(acceptation)
 
             verify(orgTermsRepository, times(1)).save(acceptation)
         }
-
     }
-
 }
