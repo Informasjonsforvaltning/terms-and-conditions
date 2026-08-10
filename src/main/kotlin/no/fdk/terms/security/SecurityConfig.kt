@@ -1,5 +1,7 @@
 package no.fdk.terms.security
 
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.security.oauth2.server.resource.autoconfigure.OAuth2ResourceServerProperties
 import org.springframework.context.annotation.Bean
@@ -20,28 +22,27 @@ import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
 
 @Configuration
 @EnableMethodSecurity
 class SecurityConfig(
     @Value("\${application.cors.originPatterns}")
-    val corsOriginPatterns: Array<String>
+    val corsOriginPatterns: Array<String>,
 ) {
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http {
             cors {
-                configurationSource = CorsConfigurationSource {
-                    val config = CorsConfiguration()
-                    config.allowCredentials = false
-                    config.allowedHeaders = listOf("*")
-                    config.maxAge = 3600L
-                    config.allowedOriginPatterns = corsOriginPatterns.toList()
-                    config.allowedMethods = listOf("GET", "POST", "OPTIONS", "DELETE", "PUT")
-                    config
-                }
+                configurationSource =
+                    CorsConfigurationSource {
+                        val config = CorsConfiguration()
+                        config.allowCredentials = false
+                        config.allowedHeaders = listOf("*")
+                        config.maxAge = 3600L
+                        config.allowedOriginPatterns = corsOriginPatterns.toList()
+                        config.allowedMethods = listOf("GET", "POST", "OPTIONS", "DELETE", "PUT")
+                        config
+                    }
             }
             sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
             authorizeHttpRequests {
@@ -54,15 +55,16 @@ class SecurityConfig(
             }
             oauth2ResourceServer { jwt { } }
             exceptionHandling {
-                accessDeniedHandler = AccessDeniedHandler { request: HttpServletRequest, response: HttpServletResponse, _ ->
-                    if (request.userPrincipal == null) {
-                        // Not authenticated - return 401
-                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
-                    } else {
-                        // Authenticated but access denied - return 403
-                        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden")
+                accessDeniedHandler =
+                    AccessDeniedHandler { request: HttpServletRequest, response: HttpServletResponse, _ ->
+                        if (request.userPrincipal == null) {
+                            // Not authenticated - return 401
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
+                        } else {
+                            // Authenticated but access denied - return 403
+                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden")
+                        }
                     }
-                }
             }
         }
         return http.build()
@@ -80,11 +82,11 @@ class SecurityConfig(
             }
         val jwtDecoder = NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build()
         jwtDecoder.setJwtValidator(
-                DelegatingOAuth2TokenValidator(
-                    JwtTimestampValidator(),
-                    JwtIssuerValidator(issuerUri),
-                    JwtClaimValidator(AUD) { aud: List<String> -> aud.contains("terms-and-conditions") }
-            )
+            DelegatingOAuth2TokenValidator(
+                JwtTimestampValidator(),
+                JwtIssuerValidator(issuerUri),
+                JwtClaimValidator(AUD) { aud: List<String> -> aud.contains("terms-and-conditions") },
+            ),
         )
         return jwtDecoder
     }

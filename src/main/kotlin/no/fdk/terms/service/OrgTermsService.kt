@@ -12,35 +12,37 @@ import org.springframework.stereotype.Service
 private val logger = LoggerFactory.getLogger(OrgTermsService::class.java)
 
 @Service
-class OrgTermsService (
+class OrgTermsService(
     private val orgTermsRepository: OrgTermsRepository,
-    private val termsRepository: TermsRepository
+    private val termsRepository: TermsRepository,
 ) {
+    fun getOrgAcceptation(orgId: String): OrgAcceptation? = orgTermsRepository.findById(orgId).orElse(null)
 
-    fun getOrgAcceptation(orgId: String): OrgAcceptation? =
-        orgTermsRepository.findById(orgId).orElse(null)
-
-    fun getOrgAcceptations(organizations: List<String>): List<OrgAcceptation> =
-        orgTermsRepository.findAllById(organizations)
+    fun getOrgAcceptations(organizations: List<String>): List<OrgAcceptation> = orgTermsRepository.findAllById(organizations)
 
     fun createOrgAcceptation(acceptation: OrgAcceptation) {
         if (termsRepository.existsById(acceptation.acceptedVersion)) {
             orgTermsRepository
-                .findById(acceptation.orgId).orElse(null)
+                .findById(acceptation.orgId)
+                .orElse(null)
                 ?.run { throw OrgAcceptationAlreadyExists() }
                 ?: orgTermsRepository.save(acceptation)
-        } else throw TermsVersionNotFound()
+        } else {
+            throw TermsVersionNotFound()
+        }
     }
 
     fun updateOrgAcceptation(acceptation: OrgAcceptation) {
         if (termsRepository.existsById(acceptation.acceptedVersion)) {
             if (orgTermsRepository.findById(acceptation.orgId).orElse(null) != null) {
                 orgTermsRepository.save(acceptation)
-            } else throw OrgAcceptationNotFound()
-        } else throw TermsVersionNotFound()
+            } else {
+                throw OrgAcceptationNotFound()
+            }
+        } else {
+            throw TermsVersionNotFound()
+        }
     }
 
-    fun deleteOrgAcceptation(orgId: String) =
-        orgTermsRepository.deleteById(orgId)
-
+    fun deleteOrgAcceptation(orgId: String) = orgTermsRepository.deleteById(orgId)
 }
