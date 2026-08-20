@@ -8,16 +8,13 @@ import org.springframework.stereotype.Service
 import java.util.regex.Pattern
 
 @Service
-class TermsService(
-    private val termsRepository: TermsRepository,
-) {
-    fun hasDBConnection(): Boolean =
-        try {
-            termsRepository.count()
-            true
-        } catch (e: Exception) {
-            false
-        }
+class TermsService(private val termsRepository: TermsRepository) {
+    fun hasDBConnection(): Boolean = try {
+        termsRepository.count()
+        true
+    } catch (e: Exception) {
+        false
+    }
 
     fun createTermsAndConditions(terms: TermsAndConditions) {
         if (!terms.version.isThreePartSemanticVersion()) {
@@ -35,12 +32,11 @@ class TermsService(
 
     fun getAllTermsAndConditions(): List<TermsAndConditions> = termsRepository.findAll()
 
-    fun getTermsAndConditions(version: String): TermsAndConditions? =
-        if (version == "latest") {
-            termsRepository.findFirstByOrderByVersionDesc()
-        } else {
-            termsRepository.findById(version).orElse(null)
-        }
+    fun getTermsAndConditions(version: String): TermsAndConditions? = if (version == "latest") {
+        termsRepository.findFirstByOrderByVersionDesc()
+    } else {
+        termsRepository.findById(version).orElse(null)
+    }
 }
 
 private fun String.isThreePartSemanticVersion(): Boolean = Pattern.matches("\\d+\\.\\d+\\.\\d+", this)

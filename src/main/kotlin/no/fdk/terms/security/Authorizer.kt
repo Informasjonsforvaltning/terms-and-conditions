@@ -12,13 +12,8 @@ private fun roleOrgWrite(orgnr: String) = "organization:$orgnr:write"
 private fun roleOrgRead(orgnr: String) = "organization:$orgnr:read"
 
 @Component("authorizer")
-class Authorizer(
-    private val securityProperties: SecurityProperties,
-) {
-    fun hasOrgReadPermission(
-        jwt: Jwt,
-        orgnr: String,
-    ): Boolean {
+class Authorizer(private val securityProperties: SecurityProperties) {
+    fun hasOrgReadPermission(jwt: Jwt, orgnr: String): Boolean {
         val authorities: String? = jwt.claims["authorities"] as? String
 
         return when {
@@ -30,10 +25,7 @@ class Authorizer(
         }
     }
 
-    fun hasOrgAdminPermission(
-        jwt: Jwt,
-        orgnr: String,
-    ): Boolean {
+    fun hasOrgAdminPermission(jwt: Jwt, orgnr: String): Boolean {
         val authorities: String? = jwt.claims["authorities"] as? String
 
         return when {
@@ -49,10 +41,9 @@ class Authorizer(
         return authorities?.contains(ROLE_ROOT_ADMIN) ?: false
     }
 
-    fun isFromFDKCluster(apiKey: String?): Boolean =
-        when {
-            apiKey == null -> false
-            apiKey.contains(securityProperties.userApiKey) -> true
-            else -> false
-        }
+    fun isFromFDKCluster(apiKey: String?): Boolean = when {
+        apiKey == null -> false
+        apiKey.contains(securityProperties.userApiKey) -> true
+        else -> false
+    }
 }

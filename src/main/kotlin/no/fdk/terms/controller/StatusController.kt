@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @CrossOrigin
 @RestController
-class StatusController(
-    private val termsService: TermsService,
-) {
+class StatusController(private val termsService: TermsService) {
     @GetMapping(value = ["/ping"])
     fun ping(): ResponseEntity<Unit> = ResponseEntity(HttpStatus.OK)
 

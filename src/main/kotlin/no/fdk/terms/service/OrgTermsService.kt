@@ -12,10 +12,7 @@ import org.springframework.stereotype.Service
 private val logger = LoggerFactory.getLogger(OrgTermsService::class.java)
 
 @Service
-class OrgTermsService(
-    private val orgTermsRepository: OrgTermsRepository,
-    private val termsRepository: TermsRepository,
-) {
+class OrgTermsService(private val orgTermsRepository: OrgTermsRepository, private val termsRepository: TermsRepository) {
     fun getOrgAcceptation(orgId: String): OrgAcceptation? = orgTermsRepository.findById(orgId).orElse(null)
 
     fun getOrgAcceptations(organizations: List<String>): List<OrgAcceptation> = orgTermsRepository.findAllById(organizations)
