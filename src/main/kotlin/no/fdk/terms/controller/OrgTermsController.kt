@@ -29,31 +29,22 @@ private val logger = LoggerFactory.getLogger(OrgTermsController::class.java)
 @CrossOrigin
 @RestController
 @RequestMapping(value = ["/terms/org"])
-class OrgTermsController(
-    private val orgTermsService: OrgTermsService,
-) {
+class OrgTermsController(private val orgTermsService: OrgTermsService) {
     @PreAuthorize("@authorizer.hasOrgAdminPermission(#jwt, #accept.orgId)")
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun createOrgAcceptation(
-        @AuthenticationPrincipal jwt: Jwt,
-        @RequestBody accept: OrgAcceptation,
-    ): ResponseEntity<Unit> =
-        try {
-            logger.info("Accept terms, version ${accept.acceptedVersion}, for organization with id ${accept.orgId}")
-            orgTermsService.createOrgAcceptation(accept)
-            ResponseEntity<Unit>(HttpStatus.CREATED)
-        } catch (ex: OrgAcceptationAlreadyExists) {
-            ResponseEntity<Unit>(HttpStatus.BAD_REQUEST)
-        } catch (ex: TermsVersionNotFound) {
-            ResponseEntity<Unit>(HttpStatus.BAD_REQUEST)
-        }
+    fun createOrgAcceptation(@AuthenticationPrincipal jwt: Jwt, @RequestBody accept: OrgAcceptation): ResponseEntity<Unit> = try {
+        logger.info("Accept terms, version ${accept.acceptedVersion}, for organization with id ${accept.orgId}")
+        orgTermsService.createOrgAcceptation(accept)
+        ResponseEntity<Unit>(HttpStatus.CREATED)
+    } catch (ex: OrgAcceptationAlreadyExists) {
+        ResponseEntity<Unit>(HttpStatus.BAD_REQUEST)
+    } catch (ex: TermsVersionNotFound) {
+        ResponseEntity<Unit>(HttpStatus.BAD_REQUEST)
+    }
 
     @PreAuthorize("@authorizer.hasOrgReadPermission(#jwt, #id)")
     @GetMapping(value = ["/{id}"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getOrgAcceptation(
-        @AuthenticationPrincipal jwt: Jwt,
-        @PathVariable id: String,
-    ): ResponseEntity<OrgAcceptation> {
+    fun getOrgAcceptation(@AuthenticationPrincipal jwt: Jwt, @PathVariable id: String): ResponseEntity<OrgAcceptation> {
         logger.info("Get terms acceptations for organization with id $id")
         return orgTermsService
             .getOrgAcceptation(id)
@@ -67,31 +58,27 @@ class OrgTermsController(
         @AuthenticationPrincipal jwt: Jwt,
         @PathVariable id: String,
         @RequestBody accept: OrgAcceptation,
-    ): ResponseEntity<Unit> =
-        when {
-            id != accept.orgId -> {
+    ): ResponseEntity<Unit> = when {
+        id != accept.orgId -> {
+            ResponseEntity<Unit>(HttpStatus.BAD_REQUEST)
+        }
+
+        else -> {
+            logger.info("Accept terms, version ${accept.acceptedVersion}, for organization with id $id")
+            try {
+                orgTermsService.updateOrgAcceptation(accept)
+                ResponseEntity<Unit>(HttpStatus.NO_CONTENT)
+            } catch (ex: OrgAcceptationNotFound) {
+                ResponseEntity<Unit>(HttpStatus.BAD_REQUEST)
+            } catch (ex: TermsVersionNotFound) {
                 ResponseEntity<Unit>(HttpStatus.BAD_REQUEST)
             }
-
-            else -> {
-                logger.info("Accept terms, version ${accept.acceptedVersion}, for organization with id $id")
-                try {
-                    orgTermsService.updateOrgAcceptation(accept)
-                    ResponseEntity<Unit>(HttpStatus.NO_CONTENT)
-                } catch (ex: OrgAcceptationNotFound) {
-                    ResponseEntity<Unit>(HttpStatus.BAD_REQUEST)
-                } catch (ex: TermsVersionNotFound) {
-                    ResponseEntity<Unit>(HttpStatus.BAD_REQUEST)
-                }
-            }
         }
+    }
 
     @PreAuthorize("@authorizer.hasSysAdminPermission(#jwt)")
     @DeleteMapping(value = ["/{id}"])
-    fun deleteOrgAcceptation(
-        @AuthenticationPrincipal jwt: Jwt,
-        @PathVariable id: String,
-    ): ResponseEntity<Unit> {
+    fun deleteOrgAcceptation(@AuthenticationPrincipal jwt: Jwt, @PathVariable id: String): ResponseEntity<Unit> {
         logger.info("Delete terms acceptations for organization with id $id")
         orgTermsService.deleteOrgAcceptation(id)
         return ResponseEntity(HttpStatus.NO_CONTENT)
@@ -99,10 +86,7 @@ class OrgTermsController(
 
     @PreAuthorize("@authorizer.isFromFDKCluster(#header)")
     @GetMapping(value = ["/{id}/version"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getOrgAcceptedVersion(
-        @RequestHeader("X-API-KEY") header: String,
-        @PathVariable id: String,
-    ): ResponseEntity<String> =
+    fun getOrgAcceptedVersion(@RequestHeader("X-API-KEY") header: String, @PathVariable id: String): ResponseEntity<String> =
         orgTermsService
             .getOrgAcceptation(id)
             ?.let { ResponseEntity(it.acceptedVersion, HttpStatus.OK) }
@@ -113,9 +97,8 @@ class OrgTermsController(
     fun getAcceptationsByOrganizations(
         @RequestHeader("X-API-KEY") header: String,
         @RequestParam(required = true) organizations: List<String>,
-    ): ResponseEntity<List<OrgAcceptation>> =
-        ResponseEntity(
-            orgTermsService.getOrgAcceptations(organizations),
-            HttpStatus.OK,
-        )
+    ): ResponseEntity<List<OrgAcceptation>> = ResponseEntity(
+        orgTermsService.getOrgAcceptations(organizations),
+        HttpStatus.OK,
+    )
 }

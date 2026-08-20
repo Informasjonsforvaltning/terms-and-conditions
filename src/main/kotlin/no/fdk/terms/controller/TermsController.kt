@@ -24,24 +24,18 @@ private val logger = LoggerFactory.getLogger(TermsController::class.java)
 @CrossOrigin
 @RestController
 @RequestMapping(value = ["/terms"])
-class TermsController(
-    private val termsService: TermsService,
-) {
+class TermsController(private val termsService: TermsService) {
     @PreAuthorize("@authorizer.hasSysAdminPermission(#jwt)")
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun createTermsAndConditions(
-        @AuthenticationPrincipal jwt: Jwt,
-        @RequestBody terms: TermsAndConditions,
-    ): ResponseEntity<Unit> =
-        try {
-            logger.info("Create terms and conditions, version ${terms.version}")
-            termsService.createTermsAndConditions(terms)
-            ResponseEntity<Unit>(HttpStatus.CREATED)
-        } catch (exception: VersionNotThreePartSemantic) {
-            ResponseEntity<Unit>(HttpStatus.BAD_REQUEST)
-        } catch (exception: NewVersionNotHighest) {
-            ResponseEntity<Unit>(HttpStatus.BAD_REQUEST)
-        }
+    fun createTermsAndConditions(@AuthenticationPrincipal jwt: Jwt, @RequestBody terms: TermsAndConditions): ResponseEntity<Unit> = try {
+        logger.info("Create terms and conditions, version ${terms.version}")
+        termsService.createTermsAndConditions(terms)
+        ResponseEntity<Unit>(HttpStatus.CREATED)
+    } catch (exception: VersionNotThreePartSemantic) {
+        ResponseEntity<Unit>(HttpStatus.BAD_REQUEST)
+    } catch (exception: NewVersionNotHighest) {
+        ResponseEntity<Unit>(HttpStatus.BAD_REQUEST)
+    }
 
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getAllTermsAndConditions(): ResponseEntity<List<TermsAndConditions>> {
@@ -50,9 +44,7 @@ class TermsController(
     }
 
     @GetMapping(value = ["/{version}"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getTermsAndConditions(
-        @PathVariable version: String,
-    ): ResponseEntity<TermsAndConditions> {
+    fun getTermsAndConditions(@PathVariable version: String): ResponseEntity<TermsAndConditions> {
         logger.info("Get terms and conditions version $version")
         return termsService
             .getTermsAndConditions(version)
@@ -61,9 +53,8 @@ class TermsController(
     }
 
     @GetMapping(value = ["/latest/version"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getLatestVersion(): ResponseEntity<String> =
-        termsService
-            .getTermsAndConditions("latest")
-            ?.let { ResponseEntity(it.version, HttpStatus.OK) }
-            ?: ResponseEntity(HttpStatus.NOT_FOUND)
+    fun getLatestVersion(): ResponseEntity<String> = termsService
+        .getTermsAndConditions("latest")
+        ?.let { ResponseEntity(it.version, HttpStatus.OK) }
+        ?: ResponseEntity(HttpStatus.NOT_FOUND)
 }
