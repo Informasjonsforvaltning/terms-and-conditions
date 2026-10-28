@@ -1,3 +1,8 @@
+server:
+  port: 8080
+  compression:
+    enabled: true
+    min-response-size: 1024
 spring:
   jackson:
     default-property-inclusion: non_null
@@ -24,7 +29,6 @@ logging:
 application:
   secrets.userApiKey: ${USER_API_KEY}
   cors.originPatterns: "${CORS_ORIGIN_PATTERNS}"
-server.port: 8080
 
 ---
 spring:
